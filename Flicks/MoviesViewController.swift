@@ -10,11 +10,18 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UITabBarDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UITabBarDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
     @IBOutlet var searchBar:UISearchBar!
     
     @IBOutlet weak var moviesTable: UITableView!
 
+    @IBOutlet weak var moviesCollection: UICollectionView!
+    
+    let itemPerRowOfCollection = 2
+    
+    let sectionInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    
     let imageBaseUrl = "https://image.tmdb.org/t/p/w342"
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     var movies = [NSDictionary]()
@@ -31,14 +38,24 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         self.moviesTable.dataSource = self
         self.moviesTable.delegate = self
+        
+        self.moviesCollection.dataSource = self
+        self.moviesCollection.delegate = self
+        
         self.searchBar.delegate = self
         
         refreshControl.addTarget(self, action: #selector(loadMoviesData), forControlEvents: UIControlEvents.ValueChanged)
         moviesTable.insertSubview(refreshControl, atIndex: 0)
+        moviesCollection.insertSubview(refreshControl, atIndex: 0)
         
         super.viewDidLoad()
         
         loadMoviesData()
+    }
+    
+
+    func movieForIndexPath(indexPath: NSIndexPath) -> NSDictionary {
+        return self.filteredMovies[indexPath.section]
     }
     
     func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
@@ -60,6 +77,42 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         self.moviesTable.reloadData()
     }
     
+    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        return self.filteredMovies.count / self.itemPerRowOfCollection
+    }
+    
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.itemPerRowOfCollection
+    }
+
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = self.moviesCollection.dequeueReusableCellWithReuseIdentifier("MovieCollectionViewCell", forIndexPath: indexPath) as! MovieCollectionViewCell
+        var movieIndex = self.itemPerRowOfCollection * indexPath.section + indexPath.row
+        
+        movieIndex = movieIndex < self.filteredMovies.count ? movieIndex : (self.filteredMovies.count - 1)
+        let currentMovie = self.filteredMovies[movieIndex]
+        
+        cell.title.text = currentMovie["original_title"] as? String
+        let imagePath = currentMovie["backdrop_path"] as? String
+        let imageURL = self.getNSURLFor(imagePath!)
+        cell.featureImage.setImageWithURL(imageURL)
+        
+        return cell
+    }
+
+    
+    func collectionView(collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                               sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        return CGSize(width: 140, height: 200)
+    }
+    
+    func collectionView(collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                               insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+        return sectionInsets
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.filteredMovies.count
     }
@@ -76,7 +129,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
         let viewController = DetailsViewController.initFromStoryBoard()
         let selectedMovie = self.filteredMovies[indexPath.row]
         viewController.movieData = selectedMovie
@@ -130,6 +182,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     self.filteredMovies = NSArray.init(array: self.movies, copyItems: true) as! [NSDictionary]
                     
                     self.moviesTable.reloadData()
+                    self.moviesCollection.reloadData()
                     
                     // Hide HUD once the network request comes back (must be done on main UI thread)
                     MBProgressHUD.hideHUDForView(self.view, animated: true)
