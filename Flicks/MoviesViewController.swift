@@ -10,7 +10,7 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
     @IBOutlet var searchBar:UISearchBar!
     
@@ -19,6 +19,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let imageBaseUrl = "https://image.tmdb.org/t/p/w342"
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     var movies = [NSDictionary]()
+    var filteredMovies = [NSDictionary]()
     let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
@@ -26,7 +27,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         self.moviesTable.dataSource = self
         self.moviesTable.delegate = self
-        
+        self.searchBar.delegate = self
         
         refreshControl.addTarget(self, action: #selector(loadMoviesData), forControlEvents: UIControlEvents.ValueChanged)
         moviesTable.insertSubview(refreshControl, atIndex: 0)
@@ -36,14 +37,29 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         loadMoviesData()
     }
    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        var filteredMovies = [NSDictionary]()
+        if searchText.characters.count > 0 {
+            filteredMovies = self.movies.filter({
+                let title = $0["original_title"] as! String
+                return title.containsString(searchText)
+            })
+            self.filteredMovies = filteredMovies
+        } else {
+            self.filteredMovies = NSArray.init(array: self.movies, copyItems: true) as! [NSDictionary]
+        }
+        
+        self.moviesTable.reloadData()
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.movies.count
+        return self.filteredMovies.count
     }
     
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = self.moviesTable.dequeueReusableCellWithIdentifier("MovieTableViewCell") as! MovieTableViewCell
-        let currentMovie = self.movies[indexPath.row]
+        let currentMovie = self.filteredMovies[indexPath.row]
         cell.title.text = currentMovie["original_title"] as? String
         cell.overview.text = currentMovie["overview"] as? String
         let imagePath = currentMovie["backdrop_path"] as? String
@@ -55,7 +71,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         let viewController = DetailsViewController.initFromStoryBoard()
-        let selectedMovie = self.movies[indexPath.row]
+        let selectedMovie = self.filteredMovies[indexPath.row]
         viewController.movieData = selectedMovie
         self.navigationController!.pushViewController(viewController, animated: true)
     }
@@ -97,6 +113,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     data!, options:[]) as? NSDictionary {
                     print("response: \(responseDictionary)")
                     self.movies = responseDictionary["results"] as! [NSDictionary]
+                    self.filteredMovies = NSArray.init(array: self.movies, copyItems: true) as! [NSDictionary]
+                    
                     self.moviesTable.reloadData()
                     
                     // Hide HUD once the network request comes back (must be done on main UI thread)
