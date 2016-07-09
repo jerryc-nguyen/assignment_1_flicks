@@ -27,6 +27,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var movies = [NSDictionary]()
     var filteredMovies = [NSDictionary]()
     let refreshControl = UIRefreshControl()
+    let refreshControlOnGridView = UIRefreshControl()
     
     static func initFromStoryBoard ()-> MoviesViewController{
         let mainStoryBoard = UIStoryboard(name: "Main", bundle: nil)
@@ -34,6 +35,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     override func viewDidLoad() {
+        showListMovies()
+        
         self.navigationItem.titleView = self.searchBar
         
         self.moviesTable.dataSource = self
@@ -45,15 +48,36 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         self.searchBar.delegate = self
         
         refreshControl.addTarget(self, action: #selector(loadMoviesData), forControlEvents: UIControlEvents.ValueChanged)
+        
+        refreshControlOnGridView.addTarget(self, action: #selector(loadMoviesData), forControlEvents: UIControlEvents.ValueChanged)
+        
+        moviesCollection.insertSubview(refreshControlOnGridView, atIndex: 0)
+        
         moviesTable.insertSubview(refreshControl, atIndex: 0)
-        moviesCollection.insertSubview(refreshControl, atIndex: 0)
         
         super.viewDidLoad()
         
         loadMoviesData()
     }
     
-
+    @IBAction func onDisplayModeChanged(sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            showListMovies()
+        } else {
+            showGridMovies()
+        }
+    }
+    
+    func showListMovies() {
+        self.moviesTable.hidden = false
+        self.moviesCollection.hidden = true
+    }
+    
+    func showGridMovies() {
+        self.moviesTable.hidden = true
+        self.moviesCollection.hidden = false
+    }
+    
     func movieForIndexPath(indexPath: NSIndexPath) -> NSDictionary {
         return self.filteredMovies[indexPath.section]
     }
@@ -75,6 +99,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }
         
         self.moviesTable.reloadData()
+        self.moviesCollection.reloadData()
     }
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
@@ -147,6 +172,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func loadMoviesData() {
         self.refreshControl.endRefreshing()
+        self.refreshControlOnGridView.endRefreshing()
         
         let selectedIndex = self.navigationController?.tabBarController?.selectedIndex
         var url = NSURL()
@@ -195,15 +221,5 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         task.resume()
     }
     
-
-    // MARK: - Navigation
-
-//    // In a storyboard-based application, you will often want to do a little preparation before navigation
-//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-//        let nextVC = segue.destinationViewController as! DetailsViewController
-//        let selectedMovie = self.movies[(moviesTable.indexPathForSelectedRow?.row)!]
-//        nextVC.movieData = selectedMovie
-//    }
-  
 
 }
