@@ -10,17 +10,21 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
-    
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UITabBarDelegate {
     @IBOutlet var searchBar:UISearchBar!
     
     @IBOutlet weak var moviesTable: UITableView!
-    
+
     let imageBaseUrl = "https://image.tmdb.org/t/p/w342"
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     var movies = [NSDictionary]()
     var filteredMovies = [NSDictionary]()
     let refreshControl = UIRefreshControl()
+    
+    static func initFromStoryBoard ()-> MoviesViewController{
+        let mainStoryBoard = UIStoryboard(name: "Main", bundle: nil)
+        return mainStoryBoard.instantiateViewControllerWithIdentifier("MoviesViewController") as! MoviesViewController
+    }
     
     override func viewDidLoad() {
         self.navigationItem.titleView = self.searchBar
@@ -36,13 +40,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         loadMoviesData()
     }
-   
+    
+    func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
+        print("item badgeValue", item.badgeValue)
+    }
+    
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         var filteredMovies = [NSDictionary]()
         if searchText.characters.count > 0 {
             filteredMovies = self.movies.filter({
                 let title = $0["original_title"] as! String
-                return title.containsString(searchText)
+                return title.lowercaseString.containsString(searchText.lowercaseString)
             })
             self.filteredMovies = filteredMovies
         } else {
@@ -55,7 +63,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.filteredMovies.count
     }
-    
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = self.moviesTable.dequeueReusableCellWithIdentifier("MovieTableViewCell") as! MovieTableViewCell
@@ -89,9 +96,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func loadMoviesData() {
         self.refreshControl.endRefreshing()
         
-        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let selectedIndex = self.navigationController?.tabBarController?.selectedIndex
+        var url = NSURL()
+        if selectedIndex == 0 {
+            url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
+        } else {
+            url = NSURL(string: "https://api.themoviedb.org/3/movie/top_rated?api_key=\(apiKey)")!
+        }
+        
         let request = NSURLRequest(
-            URL: url!,
+            URL: url,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
             timeoutInterval: 10)
         

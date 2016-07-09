@@ -9,8 +9,6 @@
 import UIKit
 
 class MovieTableViewCell: UITableViewCell {
-
- 
     @IBOutlet weak var featureImage: UIImageView!
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var overview: UILabel!
