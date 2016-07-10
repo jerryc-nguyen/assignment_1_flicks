@@ -17,11 +17,25 @@ class MovieTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
     }
-
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        initViews()
+        
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)!
+        initViews()
+    }
+    
+    func initViews() {
+        selectedBackgroundView=UIView(frame: frame)
+        selectedBackgroundView!.backgroundColor = UIColor.whiteColor()
+    }
+    
     override func setSelected(selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
-
+    
 }

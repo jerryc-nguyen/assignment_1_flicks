@@ -33,17 +33,15 @@ class ImageHandler {
     }
     
     static func loadImageFrom(imageUrl: String, forImageView: UIImageView, callBack: ((loadedImage:UIImage) -> Void)? = nil) {
-        let imgURLRequest = NSURLRequest(URL: NSURL(string: imageUrl)!)
+        let imgURLRequest = NSURLRequest(URL: NSURL(string: imageUrl)!, cachePolicy: NSURLRequestCachePolicy.ReturnCacheDataElseLoad, timeoutInterval: 86400)
         forImageView.setImageWithURLRequest(
             imgURLRequest,
             placeholderImage: nil,
             success: { (imageRequest, imageResponse, image ) -> Void in
                 
                 if imageResponse != nil {
-                    print("Image was NOT cached, fade in image")
                     setThenFadeIn(forImageView, loadedImage: image)
                 } else {
-                    print("Image was cached so just update the image")
                     forImageView.image = image
                 }
                 
