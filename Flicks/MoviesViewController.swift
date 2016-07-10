@@ -107,10 +107,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return self.filteredMovies[indexPath.section]
     }
     
-    func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
-        print("item badgeValue", item.badgeValue)
-    }
-    
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         var filteredMovies = [NSDictionary]()
         if searchText.characters.count > 0 {
@@ -130,6 +126,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return self.filteredMovies.count / self.itemPerRowOfCollection
     }
+    
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.itemPerRowOfCollection
@@ -163,6 +160,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                         layout collectionViewLayout: UICollectionViewLayout,
                                insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return sectionInsets
+    }
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let viewController = DetailsViewController.initFromStoryBoard()
+        var movieIndex = self.itemPerRowOfCollection * indexPath.section + indexPath.row
+        
+        movieIndex = movieIndex < self.filteredMovies.count ? movieIndex : (self.filteredMovies.count - 1)
+        let selectedMovie = self.filteredMovies[movieIndex]
+        viewController.movieData = selectedMovie
+        self.navigationController!.pushViewController(viewController, animated: true)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -238,7 +245,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if (error == nil && data != nil ) {
                 if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                     data!, options:[]) as? NSDictionary {
-                    print("response: \(responseDictionary)")
                     self.movies = responseDictionary["results"] as! [NSDictionary]
                     self.filteredMovies = NSArray.init(array: self.movies, copyItems: true) as! [NSDictionary]
                     

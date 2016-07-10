@@ -34,9 +34,6 @@ class DetailsViewController: UIViewController {
         
         self.date.text = movieData["release_date"] as? String
         self.movieTitle.text = movieData["original_title"] as? String
-        let  popularity = movieData["popularity"] as? NSNumber
-        self.popularity.text = popularity?.stringValue
-        self.duration.text = "123"
         self.overview.text = movieData["overview"] as? String
         let imagePath = movieData["backdrop_path"] as? String
         let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
