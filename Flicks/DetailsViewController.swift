@@ -39,10 +39,10 @@ class DetailsViewController: UIViewController {
         self.duration.text = "123"
         self.overview.text = movieData["overview"] as? String
         let imagePath = movieData["backdrop_path"] as? String
-//        let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
+        let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
         let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
         
-        ImageHandler.loadPosters(originalImageUrl, largeImageURL: originalImageUrl, posterImageView: self.detailImage)
+        ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: self.detailImage)
     }
     
     override func didReceiveMemoryWarning() {

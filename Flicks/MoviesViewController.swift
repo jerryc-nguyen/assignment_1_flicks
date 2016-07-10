@@ -121,7 +121,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let imagePath = currentMovie["backdrop_path"] as? String
         if imagePath != nil {
             let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
-            ImageHandler.loadImageFrom(smallImageUrl, forImageView: cell.featureImage)
+            let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
+            ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: cell.featureImage)
         }
         
         return cell
@@ -152,7 +153,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         if imagePath != nil {
             let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
-            ImageHandler.loadImageFrom(smallImageUrl, forImageView: cell.featureImage)
+            let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
+            ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: cell.featureImage)
         }
         
         return cell

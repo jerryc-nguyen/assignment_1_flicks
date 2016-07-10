@@ -21,14 +21,14 @@ class ImageHandler {
     
     static func loadPosters(smallImageURL:String, largeImageURL:String, posterImageView:UIImageView) {
         // load small image
-        print("Load small image for poster: \(smallImageURL)")
         loadImageFrom(smallImageURL, forImageView: posterImageView) { (smallImage) -> Void in
             // load large image
-            print("Load large image for poster: \(largeImageURL)")
-            loadImageFrom(largeImageURL, forImageView: posterImageView) { (largeImage) -> Void in
-                posterImageView.image = largeImage
-                
-            }
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                loadImageFrom(largeImageURL, forImageView: posterImageView) { (largeImage) -> Void in
+                    posterImageView.image = largeImage
+                }
+            })
+            
         }
     }
     
@@ -38,8 +38,17 @@ class ImageHandler {
             imgURLRequest,
             placeholderImage: nil,
             success: { (imageRequest, imageResponse, image ) -> Void in
+                
+                if imageResponse != nil {
+                    print("Image was NOT cached, fade in image")
+                    setThenFadeIn(forImageView, loadedImage: image)
+                } else {
+                    print("Image was cached so just update the image")
+                    forImageView.image = image
+                }
+                
                 callBack?(loadedImage: image)
-                setThenFadeIn(forImageView, loadedImage: image)
+                
             },
             failure: { (imageRequest, imageResponse, error) -> Void in
                 // do something for the failure condition
