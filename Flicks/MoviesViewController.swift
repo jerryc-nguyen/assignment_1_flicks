@@ -21,21 +21,25 @@ class MoviesViewController: UIViewController {
     let itemPerRowOfCollection = 2
     
     let sectionInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+
+    let playingURL = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed"
+    let ratedURL = "https://api.themoviedb.org/3/movie/top_rated?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed"
     
-    let imageBaseUrl = "https://image.tmdb.org/t/p/w342"
-    let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     var movies = [NSDictionary]()
     var filteredMovies = [NSDictionary]()
     let refreshControl = UIRefreshControl()
     let refreshControlOnGridView = UIRefreshControl()
     
     var navigationTitle: String {
-        let selectedIndex = self.navigationController?.tabBarController?.selectedIndex
-        if selectedIndex == 0 {
+        if self.selectedTabBarIndex == 0 {
             return "Now Playing Movies"
         } else {
             return "Top Rated Movies"
         }
+    }
+    
+    var selectedTabBarIndex: Int {
+        return (self.navigationController?.tabBarController?.selectedIndex)!
     }
     
     static func initFromStoryBoard ()-> MoviesViewController{
@@ -107,11 +111,6 @@ class MoviesViewController: UIViewController {
         return self.filteredMovies[indexPath.section]
     }
     
-    func getNSURLFor(imagePath: String) -> NSURL{
-        let fullImageURLStr = self.imageBaseUrl + imagePath
-        return NSURL(string: fullImageURLStr)!
-    }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -124,16 +123,10 @@ class MoviesViewController: UIViewController {
         self.refreshControl.endRefreshing()
         self.refreshControlOnGridView.endRefreshing()
         
-        let selectedIndex = self.navigationController?.tabBarController?.selectedIndex
-        var url = NSURL()
-        if selectedIndex == 0 {
-            url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
-        } else {
-            url = NSURL(string: "https://api.themoviedb.org/3/movie/top_rated?api_key=\(apiKey)")!
-        }
+        let urlStr = self.selectedTabBarIndex == 0 ? self.playingURL : self.ratedURL
         
         let request = NSURLRequest(
-            URL: url,
+            URL: NSURL(string: urlStr)!,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
             timeoutInterval: 10)
         
@@ -178,5 +171,4 @@ class MoviesViewController: UIViewController {
         task.resume()
     }
     
-
 }
