@@ -10,7 +10,7 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UITabBarDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+class MoviesViewController: UIViewController {
     
     @IBOutlet var searchBar:UISearchBar!
     
@@ -105,98 +105,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func movieForIndexPath(indexPath: NSIndexPath) -> NSDictionary {
         return self.filteredMovies[indexPath.section]
-    }
-    
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        var filteredMovies = [NSDictionary]()
-        if searchText.characters.count > 0 {
-            filteredMovies = self.movies.filter({
-                let title = $0["original_title"] as! String
-                return title.lowercaseString.containsString(searchText.lowercaseString)
-            })
-            self.filteredMovies = filteredMovies
-        } else {
-            self.filteredMovies = NSArray.init(array: self.movies, copyItems: true) as! [NSDictionary]
-        }
-        
-        self.moviesTable.reloadData()
-        self.moviesCollection.reloadData()
-    }
-    
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return self.filteredMovies.count / self.itemPerRowOfCollection
-    }
-    
-    
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.itemPerRowOfCollection
-    }
-
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = self.moviesCollection.dequeueReusableCellWithReuseIdentifier("MovieCollectionViewCell", forIndexPath: indexPath) as! MovieCollectionViewCell
-        var movieIndex = self.itemPerRowOfCollection * indexPath.section + indexPath.row
-        
-        movieIndex = movieIndex < self.filteredMovies.count ? movieIndex : (self.filteredMovies.count - 1)
-        let currentMovie = self.filteredMovies[movieIndex]
-        
-        cell.title.text = currentMovie["original_title"] as? String
-        let imagePath = currentMovie["backdrop_path"] as? String
-        if imagePath != nil {
-            let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
-            let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
-            ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: cell.featureImage)
-        }
-        
-        return cell
-    }
-
-    func collectionView(collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                               sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSize(width: 140, height: 200)
-    }
-    
-    func collectionView(collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                               insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-        return sectionInsets
-    }
-    
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let viewController = DetailsViewController.initFromStoryBoard()
-        var movieIndex = self.itemPerRowOfCollection * indexPath.section + indexPath.row
-        
-        movieIndex = movieIndex < self.filteredMovies.count ? movieIndex : (self.filteredMovies.count - 1)
-        let selectedMovie = self.filteredMovies[movieIndex]
-        viewController.movieData = selectedMovie
-        self.navigationController!.pushViewController(viewController, animated: true)
-    }
-    
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.filteredMovies.count
-    }
-
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = self.moviesTable.dequeueReusableCellWithIdentifier("MovieTableViewCell") as! MovieTableViewCell
-        let currentMovie = self.filteredMovies[indexPath.row]
-        cell.title.text = currentMovie["original_title"] as? String
-        cell.overview.text = currentMovie["overview"] as? String
-        let imagePath = currentMovie["backdrop_path"] as? String
-        
-        if imagePath != nil {
-            let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
-            let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
-            ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: cell.featureImage)
-        }
-        
-        return cell
-    }
-    
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let viewController = DetailsViewController.initFromStoryBoard()
-        let selectedMovie = self.filteredMovies[indexPath.row]
-        viewController.movieData = selectedMovie
-        self.navigationController!.pushViewController(viewController, animated: true)
     }
     
     func getNSURLFor(imagePath: String) -> NSURL{
