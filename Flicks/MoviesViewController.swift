@@ -241,8 +241,19 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let task: NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
             
-            let data = dataOrNil
-            if (error == nil && data != nil ) {
+            if (error != nil) {
+                // create the alert
+                let alert = UIAlertController(title: "Nework error!", message: error!.localizedDescription, preferredStyle: UIAlertControllerStyle.Alert)
+                
+                // add an action (button)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+                
+                // show the alert
+                self.presentViewController(alert, animated: true, completion: nil)
+                self.view.hidden = true
+                
+            } else {
+                let data = dataOrNil
                 if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                     data!, options:[]) as? NSDictionary {
                     self.movies = responseDictionary["results"] as! [NSDictionary]
@@ -254,10 +265,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     // Hide HUD once the network request comes back (must be done on main UI thread)
                     MBProgressHUD.hideHUDForView(self.view, animated: true)
                 }
-            } else if (error != nil) {
-                print(error!.localizedDescription)
             }
-            
         })
         task.resume()
     }
