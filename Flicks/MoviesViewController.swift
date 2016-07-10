@@ -29,6 +29,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let refreshControl = UIRefreshControl()
     let refreshControlOnGridView = UIRefreshControl()
     
+    var navigationTitle: String {
+        let selectedIndex = self.navigationController?.tabBarController?.selectedIndex
+        if selectedIndex == 0 {
+            return "Now Playing Movies"
+        } else {
+            return "Top Rated Movies"
+        }
+    }
+    
     static func initFromStoryBoard ()-> MoviesViewController{
         let mainStoryBoard = UIStoryboard(name: "Main", bundle: nil)
         return mainStoryBoard.instantiateViewControllerWithIdentifier("MoviesViewController") as! MoviesViewController
@@ -36,8 +45,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewDidLoad() {
         showListMovies()
-        
-        self.navigationItem.titleView = self.searchBar
+        customizeNavigationBar()
         
         self.moviesTable.dataSource = self
         self.moviesTable.delegate = self
@@ -65,6 +73,23 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             showListMovies()
         } else {
             showGridMovies()
+        }
+    }
+    
+    func customizeNavigationBar() {
+        self.navigationItem.title = self.navigationTitle
+        if let navigationBar = navigationController?.navigationBar {
+            navigationBar.tintColor = UIColor(red: 1.0, green: 0.25, blue: 0.25, alpha: 0.8)
+            
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+            shadow.shadowOffset = CGSizeMake(2, 2);
+            shadow.shadowBlurRadius = 4;
+            navigationBar.titleTextAttributes = [
+                NSFontAttributeName : UIFont.boldSystemFontOfSize(22),
+                NSForegroundColorAttributeName : UIColor(red: 0.5, green: 0.15, blue: 0.15, alpha: 0.8),
+                NSShadowAttributeName : shadow
+            ]
         }
     }
     
@@ -175,6 +200,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        view.endEditing(true)
     }
     
     func loadMoviesData() {
