@@ -119,13 +119,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         cell.title.text = currentMovie["original_title"] as? String
         let imagePath = currentMovie["backdrop_path"] as? String
-        let imageURL = self.getNSURLFor(imagePath!)
-        cell.featureImage.setImageWithURL(imageURL)
+        if imagePath != nil {
+            let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
+            ImageHandler.loadImageFrom(smallImageUrl, forImageView: cell.featureImage)
+        }
         
         return cell
     }
 
-    
     func collectionView(collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                                sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
@@ -148,8 +149,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         cell.title.text = currentMovie["original_title"] as? String
         cell.overview.text = currentMovie["overview"] as? String
         let imagePath = currentMovie["backdrop_path"] as? String
-        let imageURL = self.getNSURLFor(imagePath!)
-        cell.featureImage.setImageWithURL(imageURL)
+        
+        if imagePath != nil {
+            let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
+            ImageHandler.loadImageFrom(smallImageUrl, forImageView: cell.featureImage)
+        }
+        
         return cell
     }
     
@@ -164,7 +169,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let fullImageURLStr = self.imageBaseUrl + imagePath
         return NSURL(string: fullImageURLStr)!
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

@@ -22,8 +22,6 @@ class DetailsViewController: UIViewController {
     
     @IBOutlet weak var overview: UILabel!
     
-    let imageBaseUrl = "https://image.tmdb.org/t/p/w342"
-    
     var movieData = NSDictionary()
     
     static func initFromStoryBoard ()-> DetailsViewController{
@@ -41,15 +39,10 @@ class DetailsViewController: UIViewController {
         self.duration.text = "123"
         self.overview.text = movieData["overview"] as? String
         let imagePath = movieData["backdrop_path"] as? String
-        let imageURL = getNSURLFor(imagePath!)
-        self.detailImage.setImageWithURL(imageURL)
-        // Do any additional setup after loading the view.
+//        let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
+        let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
         
-    }
-    
-    func getNSURLFor(imagePath: String) -> NSURL{
-        let fullImageURLStr = self.imageBaseUrl + imagePath
-        return NSURL(string: fullImageURLStr)!
+        ImageHandler.loadPosters(originalImageUrl, largeImageURL: originalImageUrl, posterImageView: self.detailImage)
     }
     
     override func didReceiveMemoryWarning() {
@@ -57,15 +50,5 @@ class DetailsViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
