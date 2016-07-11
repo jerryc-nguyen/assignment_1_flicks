@@ -22,18 +22,8 @@ extension MoviesViewController: UICollectionViewDataSource, UICollectionViewDele
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = self.moviesCollection.dequeueReusableCellWithReuseIdentifier("MovieCollectionViewCell", forIndexPath: indexPath) as! MovieCollectionViewCell
         var movieIndex = self.itemPerRowOfCollection * indexPath.section + indexPath.row
-        
         movieIndex = movieIndex < self.filteredMovies.count ? movieIndex : (self.filteredMovies.count - 1)
-        let currentMovie = self.filteredMovies[movieIndex]
-        
-        cell.title.text = currentMovie["original_title"] as? String
-        let imagePath = currentMovie["backdrop_path"] as? String
-        if imagePath != nil {
-            let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
-            let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
-            ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: cell.featureImage)
-        }
-        
+        cell.bindingDataFor(self.filteredMovies[movieIndex])
         return cell
     }
     

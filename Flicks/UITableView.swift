@@ -16,16 +16,7 @@ extension MoviesViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = self.moviesTable.dequeueReusableCellWithIdentifier("MovieTableViewCell") as! MovieTableViewCell
         let currentMovie = self.filteredMovies[indexPath.row]
-        cell.title.text = currentMovie["original_title"] as? String
-        cell.overview.text = currentMovie["overview"] as? String
-        let imagePath = currentMovie["backdrop_path"] as? String
-        
-        if imagePath != nil {
-            let smallImageUrl = ImageHandler.fullImageURLFor(imagePath!)
-            let originalImageUrl = ImageHandler.fullImageURLFor(imagePath!, isSmall: false)
-            ImageHandler.loadPosters(smallImageUrl, largeImageURL: originalImageUrl, posterImageView: cell.featureImage)
-        }
-        
+        cell.bindingDataFor(currentMovie)
         return cell
     }
     
