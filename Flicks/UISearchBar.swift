@@ -16,7 +16,13 @@ extension MoviesViewController: UISearchBarDelegate {
                 let title = $0["original_title"] as! String
                 return title.lowercaseString.containsString(searchText.lowercaseString)
             })
-            self.filteredMovies = filteredMovies
+            if filteredMovies.count > 0 {
+                hideErrorMessage()
+                self.filteredMovies = filteredMovies
+            } else {
+                showErrorMessage("No results found")
+            }
+            
         } else {
             self.filteredMovies = NSArray.init(array: self.movies, copyItems: true) as! [NSDictionary]
         }

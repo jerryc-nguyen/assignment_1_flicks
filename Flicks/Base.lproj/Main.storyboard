@@ -49,7 +49,7 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="networkError" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="guh-2K-q9W">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="errorMessage" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="guh-2K-q9W">
                                 <rect key="frame" x="0.0" y="91" width="320" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -178,9 +178,9 @@
                     <tabBarItem key="tabBarItem" title="Item" id="FdD-cw-YFX"/>
                     <navigationItem key="navigationItem" id="WJd-Xq-xmn"/>
                     <connections>
+                        <outlet property="errorMessage" destination="guh-2K-q9W" id="ScC-fh-GXf"/>
                         <outlet property="moviesCollection" destination="5YW-ik-Zwx" id="ccs-aO-f7A"/>
                         <outlet property="moviesTable" destination="62r-IC-hUf" id="asW-dx-DAb"/>
-                        <outlet property="networkErrorMessage" destination="guh-2K-q9W" id="q27-6P-Dxu"/>
                         <outlet property="searchBar" destination="I1c-tr-UdV" id="8xj-U8-MPU"/>
                     </connections>
                 </viewController>

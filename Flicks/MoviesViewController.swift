@@ -12,8 +12,8 @@ import MBProgressHUD
 
 class MoviesViewController: UIViewController {
     
-    @IBOutlet weak var networkErrorMessage: UILabel!
-    
+    @IBOutlet weak var errorMessage: UILabel!
+
     @IBOutlet var searchBar:UISearchBar!
     
     @IBOutlet weak var moviesTable: UITableView!
@@ -102,16 +102,18 @@ class MoviesViewController: UIViewController {
         }
     }
     
-    func showNetworkErrorMessage() {
-        self.networkErrorMessage.hidden = false
+    func showErrorMessage(message: String) {
+        self.errorMessage.hidden = false
         self.moviesTable.hidden = true
         self.moviesCollection.hidden = true
+        self.errorMessage.text = message
     }
     
-    func hideNetworkErrorMessage() {
-        self.networkErrorMessage.hidden = true
+    func hideErrorMessage() {
+        self.errorMessage.hidden = true
         self.moviesTable.hidden = false
         self.moviesCollection.hidden = false
+        self.errorMessage.text = ""
     }
     
     func showListMovies() {
@@ -160,12 +162,11 @@ class MoviesViewController: UIViewController {
             completionHandler: { (dataOrNil, response, error) in
             
             if error != nil {
-                self.networkErrorMessage.text = error!.localizedDescription
-                self.showNetworkErrorMessage()
+                self.showErrorMessage(error!.localizedDescription)
                 MBProgressHUD.hideHUDForView(self.view, animated: true)
             } else {
                 let data = dataOrNil
-                self.hideNetworkErrorMessage()
+                self.hideErrorMessage()
                 if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                     data!, options:[]) as? NSDictionary {
                     self.movies = responseDictionary["results"] as! [NSDictionary]
