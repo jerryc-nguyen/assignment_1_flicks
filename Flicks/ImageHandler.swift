@@ -24,9 +24,7 @@ class ImageHandler {
         loadImageFrom(smallImageURL, forImageView: posterImageView) { (smallImage) -> Void in
             // load large image
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                loadImageFrom(largeImageURL, forImageView: posterImageView) { (largeImage) -> Void in
-                    posterImageView.image = largeImage
-                }
+                loadImageFrom(largeImageURL, forImageView: posterImageView)
             })
             
         }

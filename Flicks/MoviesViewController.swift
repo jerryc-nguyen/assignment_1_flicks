@@ -12,6 +12,8 @@ import MBProgressHUD
 
 class MoviesViewController: UIViewController {
     
+    @IBOutlet weak var networkErrorMessage: UILabel!
+    
     @IBOutlet var searchBar:UISearchBar!
     
     @IBOutlet weak var moviesTable: UITableView!
@@ -50,7 +52,7 @@ class MoviesViewController: UIViewController {
     override func viewDidLoad() {
         showListMovies()
         customizeNavigationBar()
-        
+
         self.moviesTable.dataSource = self
         self.moviesTable.delegate = self
         
@@ -58,6 +60,9 @@ class MoviesViewController: UIViewController {
         self.moviesCollection.delegate = self
         
         self.searchBar.delegate = self
+        
+        refreshControl.backgroundColor = view.backgroundColor
+        refreshControlOnGridView.backgroundColor = view.backgroundColor
         
         refreshControl.addTarget(self, action: #selector(loadMoviesData), forControlEvents: UIControlEvents.ValueChanged)
         
@@ -95,6 +100,18 @@ class MoviesViewController: UIViewController {
                 NSShadowAttributeName : shadow
             ]
         }
+    }
+    
+    func showNetworkErrorMessage() {
+        self.networkErrorMessage.hidden = false
+        self.moviesTable.hidden = true
+        self.moviesCollection.hidden = true
+    }
+    
+    func hideNetworkErrorMessage() {
+        self.networkErrorMessage.hidden = true
+        self.moviesTable.hidden = false
+        self.moviesCollection.hidden = false
     }
     
     func showListMovies() {
@@ -142,19 +159,13 @@ class MoviesViewController: UIViewController {
         let task: NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
             
-            if (error != nil) {
-                // create the alert
-                let alert = UIAlertController(title: "Nework error!", message: error!.localizedDescription, preferredStyle: UIAlertControllerStyle.Alert)
-                
-                // add an action (button)
-                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-                
-                // show the alert
-                self.presentViewController(alert, animated: true, completion: nil)
-                self.view.hidden = true
-                
+            if error != nil {
+                self.networkErrorMessage.text = error!.localizedDescription
+                self.showNetworkErrorMessage()
+                MBProgressHUD.hideHUDForView(self.view, animated: true)
             } else {
                 let data = dataOrNil
+                self.hideNetworkErrorMessage()
                 if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                     data!, options:[]) as? NSDictionary {
                     self.movies = responseDictionary["results"] as! [NSDictionary]
